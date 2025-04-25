@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>币安 Alpha 积分计算器</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #ffffff;
+      /* 浅灰色斜线纹理 */
+      background-image: repeating-linear-gradient(
+        45deg,
+        #f0f0f0,
+        #f0f0f0 1px,
+        transparent 1px,
+        transparent 6px
+      );
+      color: #333333;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      color: #000000;
+      margin-bottom: 20px;
+    }
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 10px 24px;
+      border: none;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .binance-btn { background: #F3BA2F; color: #000; }
+    .youtube-btn { background: #FF0000; color: #fff; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    #inputSection {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+    #inputSection label { display: block; margin-bottom: 8px; font-weight: 600; color: #555555; }
+    #inputSection input[type="number"] {
+      width: 100%; max-width: 300px;
+      padding: 10px; margin-bottom: 20px;
+      border: 1px solid #cccccc; border-radius: 4px;
+      background: #fafafa; color: #333333; font-size: 16px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    #inputSection input[type="number"]:hover { border-color: #888888; }
+    #inputSection input[type="number"]:focus {
+      outline: none; border-color: #22aa22;
+      box-shadow: 0 0 8px rgba(34,170,34,0.3); background: #ffffff;
+    }
+    #applyBtn {
+      display: inline-block; padding: 10px 24px;
+      background: #22aa22; color: #ffffff;
+      border: none; border-radius: 4px; cursor: pointer;
+      font-size: 16px; font-weight: 600;
+      transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+    }
+    #applyBtn:hover { background: #1e991e; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(34,170,34,0.3); }
+    #applyBtn:active { transform: translateY(0); box-shadow: 0 2px 6px rgba(34,170,34,0.3); }
+    table {
+      width: 100%; border-collapse: collapse;
+      background: #ffffff; margin-top: 20px;
+      border-radius: 8px; overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 12px; text-align: center; color: #333333;
+      border-bottom: 1px solid #eeeeee;
+    }
+    th { background: #f9f9f9; font-weight: 600; }
+    tfoot td { font-weight: 600; background: #f9f9f9; }
+  </style>
+</head>
+<body>
+  <h1>币安 Alpha 积分计算器</h1>
+  <div class="button-container">
+    <a href="https://bit.ly/BinanceAlpha" target="_blank" class="btn binance-btn">注册币安</a>
+    <a href="https://www.youtube.com/@nightflyer21" target="_blank" class="btn youtube-btn">YouTube 频道</a>
+  </div>
+  <div id="inputSection">
+    <label for="balanceInput">交易所总余额（美元）：</label>
+    <input type="number" id="balanceInput" min="0" step="0.01" placeholder="输入总余额">
+    <label for="volumeInput">每日交易量（美元）：</label>
+    <input type="number" id="volumeInput" min="0" step="0.01" placeholder="输入当日交易量">
+    <button id="applyBtn">计算</button>
+  </div>
+  <table id="pointsTable">
+    <thead>
+      <tr>
+        <th>交易所总余额</th>
+        <th>余额积分</th>
+        <th>当日交易量</th>
+        <th>交易积分</th>
+        <th>当日积分</th>
+        <th>15天总积分</th>
+      </tr>
+    </thead>
+    <tbody id="pointsBody">
+      <!-- 仅显示一行结果 -->
+    </tbody>
+  </table>
+  <script>
+    function calculateBS(balance) {
+      if (balance >= 100000) return 4;
+      if (balance >= 10000) return 3;
+      if (balance >= 1000) return 2;
+      if (balance >= 100) return 1;
+      return 0;
+    }
+    function calculateVS(volume) {
+      if (volume >= 2) {
+        const pts = Math.floor(Math.log2(volume/2)) + 1;
+        return pts > 0 ? pts : 0;
+      }
+      return 0;
+    }
+    document.getElementById('applyBtn').addEventListener('click', function() {
+      const bal = parseFloat(document.getElementById('balanceInput').value) || 0;
+      const vol = parseFloat(document.getElementById('volumeInput').value) || 0;
+      const bs = calculateBS(bal);
+      const vs = calculateVS(vol);
+      const ds = bs + vs;
+      const total = ds * 15;
+      const tbody = document.getElementById('pointsBody');
+      tbody.innerHTML = `<tr>
+        <td>${bal.toFixed(2)}</td>
+        <td>${bs}</td>
+        <td>${vol.toFixed(2)}</td>
+        <td>${vs}</td>
+        <td>${ds}</td>
+        <td>${total}</td>
+      </tr>`;
+    });
+  </script>
+</body>
+</html>
